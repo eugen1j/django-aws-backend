@@ -2,11 +2,15 @@ image: python:3.10
 
 stages:
   - test
+  - build
 
 variables:
   POSTGRES_PASSWORD: password
   POSTGRES_DB: django_aws
   DATABASE_URL: postgres://postgres:password@postgres:5432/django_aws
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  AWS_REGISTRY_URL: "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${CI_PROJECT_NAME}:latest"
 
 test:
   services:
@@ -26,3 +30,17 @@ test:
     - pip install --upgrade pip
     - pip install -r requirements.txt
     - python manage.py test
+
+build:
+  stage: build
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  services:
+    - docker:20.10-dind
+  before_script:
+    - aws ecr get-login-password | docker login --username AWS --password-stdin $AWS_REGISTRY_URL
+  script:
+    - docker pull $AWS_REGISTRY_URL || true
+    - docker build --cache-from $AWS_REGISTRY_URL -t $AWS_REGISTRY_URL .
+    - docker push $AWS_REGISTRY_URL
+  only:
+    - main
