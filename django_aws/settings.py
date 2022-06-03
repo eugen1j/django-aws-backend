@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'django_aws.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db(default="postgresql://postgres:postgres@127.0.0.1:5433/django_aws")
+    'default': env.db(default="postgresql://postgres:postgres@127.0.0.1:5432/django_aws")
 }
 
 

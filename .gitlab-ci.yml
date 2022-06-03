@@ -3,6 +3,7 @@ image: python:3.10
 stages:
   - test
   - build
+  - deploy
 
 variables:
   POSTGRES_PASSWORD: password
@@ -42,5 +43,13 @@ build:
     - docker pull $AWS_REGISTRY_URL || true
     - docker build --cache-from $AWS_REGISTRY_URL -t $AWS_REGISTRY_URL .
     - docker push $AWS_REGISTRY_URL
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  script:
+    - ./scripts/deploy.sh
   only:
     - main
