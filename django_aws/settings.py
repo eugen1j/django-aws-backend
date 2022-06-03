@@ -25,12 +25,12 @@ if env_path.is_file():
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%$3djya*8hsj3xo#h4gq^hs)@o0qw-los_o&ygsya9=qhb-95('
+SECRET_KEY = env("SECRET_KEY", default="ewfi83f2ofee3398fh2ofno24f")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env("DEBUG", cast=bool, default=True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env("ALLOWED_HOSTS", cast=list, default=["*"])
 
 
 # Application definition
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django_aws.middleware.health_check_middleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
